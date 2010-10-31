@@ -64,7 +64,7 @@ BEGIN {
     }
 };
 
-my $d = HTTP::Daemon->new( LocalAddr => 'localhost' ) || die;
+my $d = HTTP::Daemon->new() || die;
 my $server_host = $d->url;
 my $is_test;
 my $STATUS_STORAGE_FILE = "t/status.storage";
@@ -580,6 +580,8 @@ sub shutdown_server {
 
 sub strip_host_from_sitemap {
     my $data = shift;
+    (my $host = $server_host) =~ s/^.*?\/\/([^:\/]+).*$/$1/;
     $$data =~ s/$server_host//g;
+    $$data =~ s/$host//g;
 }
 
