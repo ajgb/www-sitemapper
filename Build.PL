@@ -22,7 +22,7 @@ my $builder = Module::Build->new(
         'HTML::HeadParser' => 3.60,
         'DateTime' => 0.53,
         'Template' => 2.22,
-        'Search::Sitemap' => 2.10,
+        'Search::Sitemap' => 2.11,
     },
     add_to_cleanup      => [ 'WWW-Sitemapper-*' ],
     create_makefile_pl => 'traditional',

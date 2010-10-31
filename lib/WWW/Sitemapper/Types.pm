@@ -15,7 +15,7 @@ use URI;
 use DateTime;
 use DateTime::Duration;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use MooseX::Types -declare => [qw(
     tURI

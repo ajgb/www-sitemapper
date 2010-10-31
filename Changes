@@ -1,5 +1,9 @@
 Revision history for WWW-Sitemapper
 
+0.04    Sun Oct 31 21:14:15 2010
+        Require Search::Sitemap in version 2.11 from github to stop tests
+        failures.
+
 0.03    Sun Mar 28 14:46:21 2010
         Documentation improvements.
         Add missing required modules into Build.PL.

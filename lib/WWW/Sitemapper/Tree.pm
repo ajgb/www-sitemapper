@@ -12,7 +12,7 @@ WWW::Sitemapper::Tree - Tree structure of pages.
 use Moose;
 use WWW::Sitemapper::Types qw( tURI tDateTime );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 ATTRIBUTES
 

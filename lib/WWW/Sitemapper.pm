@@ -22,7 +22,7 @@ BEGIN {
     extends qw( MooseX::MethodAttributes::Inheritable );
 };
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -1016,6 +1016,11 @@ sub _set_page_data : Hook('invoke-after-get') {
 
     return 0;
 }
+
+=head1 CAVEATS
+
+L<Search::Sitemap> v2.11 required by this module is available on github only.
+Please see L<bug report on RT|https://rt.cpan.org/Public/Bug/Display.html?id=61197>
 
 =head1 AUTHOR
 
