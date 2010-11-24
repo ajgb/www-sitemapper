@@ -1,13 +1,7 @@
-
+use strict;
+use warnings;
 package WWW::Sitemapper;
-
-=encoding utf8
-
-=head1 NAME
-
-WWW::Sitemapper - Create text, html and xml sitemap by scanning a web site.
-
-=cut
+#ABSTRACT: Create text, html and xml sitemap by scanning a web site.
 
 use Moose;
 use WWW::Sitemapper::Types qw( tURI tDateTime tDateTimeDuration );
@@ -16,13 +10,14 @@ use URI;
 use DateTime;
 use DateTime::Duration;
 use WWW::Robot;
+use WWW::Sitemap::XML;
+use WWW::Sitemap::XML::URL;
 use Storable qw( store retrieve );
 
 BEGIN {
     extends qw( MooseX::MethodAttributes::Inheritable );
 };
 
-our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -138,9 +133,8 @@ and while mapper is still running take a peek what has been mapped so far
     print $mapper->txt_sitemap();
 
 
-=head1 ATTRIBUTES
 
-=head2 site
+=attr site
 
 Home page of the website to be mapped.
 
@@ -155,7 +149,7 @@ has 'site' => (
     coerce => 1,
 );
 
-=head2 tree
+=attr tree
 
 Tree structure of the web site.
 
@@ -190,7 +184,7 @@ sub _build_tree {
     return $root;
 }
 
-=head2 robot_config
+=attr robot_config
 
 L<WWW::Robot> configuration options.
 
@@ -241,7 +235,7 @@ sub _build_robot_config {
 sub _build__robot {
     my $self = shift;
     my %opts = (
-        VERSION => $VERSION,
+        VERSION => $WWW::Sitemapper::VERSION,
         TRAVERSAL => 'breadth',
         NAME => ref $self,
         %{$self->robot_config}
@@ -251,7 +245,7 @@ sub _build__robot {
     );
 }
 
-=head2 status_storage
+=attr status_storage
 
 Path of status storage file to be used for saving the result of web crawl.
 If defined L<Storable> will be used to store the current state.
@@ -265,7 +259,7 @@ has 'status_storage' => (
     isa => 'Str',
 );
 
-=head2 auto_save
+=attr auto_save
 
 Auto save current status every N minutes (defaults to 0 - do not auto save).
 
@@ -288,7 +282,7 @@ has '_last_saved_time' => (
     coerce => 1,
 );
 
-=head2 run_started_time
+=attr run_started_time
 
 Time when L<"run"> method was called.
 
@@ -302,7 +296,7 @@ has 'run_started_time' => (
     coerce => 1,
 );
 
-=head2 html_sitemap_template
+=attr html_sitemap_template
 
 L<Template-Toolkit|Template> html sitemap template to be used by helper method
 L<"html_sitemap">.
@@ -384,9 +378,7 @@ EOT
 
 
 
-=head1 METHODS
-
-=head2 run
+=method run
 
     print $mapper->run();
 
@@ -402,7 +394,7 @@ will be used to decide if the page should be followed and added to sitemap.
     sub url_test : Hook('follow-url-test') {
         my $self = shift;
         my ($robot, $hook_name, $uri) = @_;
-        
+
         my $should_follow = ...
 
         return $should_follow;
@@ -444,7 +436,7 @@ sub run {
     return $self->_robot->run();
 }
 
-=head2 txt_sitemap
+=method txt_sitemap
 
     print $mapper->txt_sitemap();
 
@@ -502,7 +494,7 @@ sub txt_sitemap {
 }
 
 
-=head2 html_sitemap
+=method html_sitemap
 
     print $mapper->html_sitemap(%TT_CONF);
 
@@ -538,18 +530,19 @@ sub html_sitemap {
     return $html;
 }
 
-=head2 xml_sitemap
+=method xml_sitemap
 
     my $sitemap = $mapper->xml_sitemap();
 
     # print xml
-    print $sitemap->xml();
+    print $sitemap->as_xml->sprint;
 
     # write to file
+
     $sitemap->write('sitemap.xml');
 
-Create XML sitemap (L<http://www.sitemaps.org>). Returns 
-L<Search::Sitemap> object. 
+Create L<XML sitemap|http://www.sitemaps.org>. Returns
+L<WWW::Sitemap::XML> object.
 
 Accepts following parameters:
 
@@ -567,14 +560,14 @@ Accepts following parameters:
 
 Arrayref of regular expressions used to split the final sitemap based on
 the page location - L<WWW::Sitemapper::Tree/loc>. If this option is supplied
-the L<"xml_sitemap"> will return an array of L<Search::Sitemap> objects plus
-one additional for any urls not matched by conditions provided.
+the L<"xml_sitemap"> will return an array of L<WWW::Sitemap::XML> objects plus
+additional one for any urls not matched by conditions provided.
 
 Note: the first matching condition is used.
 
-Note: schema and hostname are remove from node uri for condition matching. 
+Note: schema and hostname are remove from node uri for condition matching.
 
-Note: keys could be regexp or string objects.
+Note: keys could be regexp or strings.
 
 =item * priority
 
@@ -621,7 +614,7 @@ Final priority will be set to 1.0 if the calculated one is higher then 1.
 
 Default priority is 0.5.
 
-Note: schema and hostname are remove from node uri for condition matching. 
+Note: schema and hostname are remove from node uri for condition matching.
 
 Note: keys could be regexp or string objects.
 
@@ -682,7 +675,7 @@ Valid values are:
 
 Default changefreq is 'weekly'.
 
-Note: schema and hostname are remove from node uri for condition matching. 
+Note: schema and hostname are remove from node uri for condition matching.
 
 Note: keys could be regexp or string objects.
 
@@ -693,9 +686,6 @@ Note: keys could be regexp or string objects.
 sub xml_sitemap {
     my $self = shift;
     my %args = @_;
-
-    require Search::Sitemap;
-    require Search::Sitemap::URL;
 
     no warnings 'recursion';
 
@@ -800,7 +790,7 @@ sub xml_sitemap {
     push @{ $RULES{SPLIT} }, $DEFAULT{split_by};
 
     my @maps = map {
-        $RULES{SPLIT}->[$_] => Search::Sitemap->new()
+        $RULES{SPLIT}->[$_] => WWW::Sitemap::XML->new()
     } 0 .. @{ $RULES{SPLIT} } - 1;
 
 
@@ -861,7 +851,7 @@ sub xml_sitemap {
             for (my $i = 0; $i < @maps; $i += 2) {
                 my ($re, $map) = @maps[ $i .. $i+1];
                 if ( $loc =~ /$re/ ) {
-                    $map->add( Search::Sitemap::URL->new(%conf) );
+                    $map->add( WWW::Sitemap::XML::URL->new(%conf) );
                     last;
                 }
             }
@@ -1016,25 +1006,5 @@ sub _set_page_data : Hook('invoke-after-get') {
 
     return 0;
 }
-
-=head1 CAVEATS
-
-L<Search::Sitemap> v2.11 required by this module is available on github only.
-Please see L<bug report on RT|https://rt.cpan.org/Public/Bug/Display.html?id=61197>
-
-=head1 AUTHOR
-
-Alex J. G. Burzyński, E<lt>ajgb@cpan.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2010 by Alex J. G. Burzyński
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
-
-
-=cut
 
 1;

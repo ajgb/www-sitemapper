@@ -1,21 +1,11 @@
-
-package WWW::Sitemapper::Types;
-
-=encoding utf8
-
-=head1 NAME
-
-WWW::Sitemapper::Types - types used by L<WWW::Sitemapper>.
-
-=cut
-
 use strict;
 use warnings;
+package WWW::Sitemapper::Types;
+#ABSTRACT: Types used by L<WWW::Sitemapper>.
+
 use URI;
 use DateTime;
 use DateTime::Duration;
-
-our $VERSION = '0.04';
 
 use MooseX::Types -declare => [qw(
     tURI
@@ -33,9 +23,9 @@ use MooseX::Types::Moose qw(
 
     use WWW::Sitemapper::Types qw( tURI tDateTime tDateTimeDuration );
 
-=head1 TYPES
+=cut
 
-=head2 tURI
+=type tURI
 
     has 'uri' => (
         is => 'rw',
@@ -55,7 +45,7 @@ coerce tURI,
     from Str,
         via { URI->new( $_, 'http' ) };
 
-=head2 tDateTime
+=type tDateTime
 
     has 'datetime' => (
         is => 'rw',
@@ -76,7 +66,7 @@ coerce tDateTime,
         via { DateTime->from_epoch( epoch => $_ ) };
 
 
-=head2 tDateTimeDuration
+=type tDateTimeDuration
 
     has 'datetimeduration' => (
         is => 'rw',
@@ -96,22 +86,5 @@ class_type tDateTimeDuration, { class => 'DateTime::Duration' };
 coerce tDateTimeDuration,
     from Num,
         via { DateTime::Duration->new( minutes => $_ ) };
-
-
-
-=head1 AUTHOR
-
-Alex J. G. Burzyński, E<lt>ajgb@cpan.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2010 by Alex J. G. Burzyński
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
-
-
-=cut
 
 1;

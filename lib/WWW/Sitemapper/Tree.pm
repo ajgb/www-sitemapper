@@ -1,22 +1,12 @@
-
+use strict;
+use warnings;
 package WWW::Sitemapper::Tree;
-
-=encoding utf8
-
-=head1 NAME
-
-WWW::Sitemapper::Tree - Tree structure of pages.
-
-=cut
+#ABSTRACT: Tree structure of pages.
 
 use Moose;
 use WWW::Sitemapper::Types qw( tURI tDateTime );
 
-our $VERSION = '0.04';
-
-=head1 ATTRIBUTES
-
-=head2 id
+=attr id
 
 Unique id of the node.
 
@@ -31,7 +21,7 @@ has 'id' => (
     default => '0',
 );
 
-=head2 uri
+=attr uri
 
 URI object for page. Represents the link found on the web site - before any
 redirections.
@@ -51,7 +41,7 @@ has '_base_uri' => (
     isa => tURI,
 );
 
-=head2 title
+=attr title
 
 Title of page.
 
@@ -64,7 +54,7 @@ has 'title' => (
     isa => 'Str',
 );
 
-=head2 last_modified
+=attr last_modified
 
 Value of Last-modified header.
 
@@ -78,7 +68,7 @@ has 'last_modified' => (
     coerce => 1,
 );
 
-=head2 nodes
+=attr nodes
 
 An array of all mapped links found on the page - represented by
 L<WWW::Sitemapper::Tree>.
@@ -121,9 +111,8 @@ has '_redirects' => (
     },
 );
 
-=head1 METHODS
 
-=head2 find_node
+=method find_node
 
     my $mapper = MyWebSite::Map->new(
         site => 'http://mywebsite.com/',
@@ -149,7 +138,7 @@ sub find_node {
     return;
 }
 
-=head2 redirected_from
+=method redirected_from
 
     my $parent = $mapper->tree->redirected_from( $uri );
 
@@ -169,7 +158,7 @@ sub redirected_from {
     return;
 }
 
-=head2 add_node
+=method add_node
 
     my $child = $parent->add_node(
         WWW::Sitemapper::Tree->new(
@@ -192,7 +181,7 @@ sub add_node {
     return $link;
 }
 
-=head2 loc
+=method loc
     
     print $node->loc;
 
@@ -208,27 +197,13 @@ sub loc {
 }
 
 
-=head2 children
+=method children
 
     for my $child ( $node->children ) {
         ...
     }
 
 Returns all children of the node.
-
-
-=head1 AUTHOR
-
-Alex J. G. Burzyński, E<lt>ajgb@cpan.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2010 by Alex J. G. Burzyński
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
-
 
 =cut
 

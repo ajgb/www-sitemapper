@@ -95,7 +95,7 @@ if ($is_test = fork ) {
                 22.html
     );
     my @valid_redirects = map {
-        "$server_host$_" 
+        "$server_host$_"
     } qw(
         friendly_url.html
     );
@@ -332,8 +332,8 @@ if ($is_test = fork ) {
     } "txt_sitemap() called successfully";
     {
         local $/;
-        open( FILE, "t/data/txt_sitemap.txt" )
-            or die "Cannot open txt_sitemap.txt: $!\n";
+        open( FILE, "t/data/sitemap.txt" )
+            or die "Cannot open sitemap.txt: $!\n";
         $_txt_sitemap = <FILE>;
         close( FILE );
     }
@@ -345,8 +345,8 @@ if ($is_test = fork ) {
     } "txt_sitemap() called successfully";
     {
         local $/;
-        open( FILE, "t/data/txt_sitemap_with_id.txt" )
-            or die "Cannot open txt_sitemap.txt: $!\n";
+        open( FILE, "t/data/sitemap_with_id.txt" )
+            or die "Cannot open sitemap_with_id.txt: $!\n";
         $_txt_sitemap = <FILE>;
         close( FILE );
     }
@@ -360,8 +360,8 @@ if ($is_test = fork ) {
     } "txt_sitemap() called successfully";
     {
         local $/;
-        open( FILE, "t/data/txt_sitemap_with_id_with_title.txt" )
-            or die "Cannot open txt_sitemap.txt: $!\n";
+        open( FILE, "t/data/sitemap_with_id_with_title.txt" )
+            or die "Cannot open sitemap_with_id_with_title.txt: $!\n";
         $_txt_sitemap = <FILE>;
         close( FILE );
     }
@@ -390,7 +390,7 @@ if ($is_test = fork ) {
     my $xml_sitemap;
     my $_xml_sitemap;
     lives_ok {
-        $xml_sitemap = $mapper->xml_sitemap()->xml();
+        $xml_sitemap = $mapper->xml_sitemap->as_xml->sprint;
     } "xml_sitemap() called successfully";
     do {
         my $url = sprintf(
@@ -412,7 +412,7 @@ if ($is_test = fork ) {
         $xml_sitemap = $mapper->xml_sitemap(
             priority => '-0.2',
             changefreq => 'daily',
-        )->xml();
+        )->as_xml->sprint;
     } "xml_sitemap(priority=>scalar, changefreq=>scalar) called successfully";
     do {
         my $url = sprintf(
@@ -441,7 +441,7 @@ if ($is_test = fork ) {
                 '3\d?\.html' => 'always',
                 '\.pdf$' => 'never',
             },
-        )->xml();
+        )->as_xml->sprint;
     } "xml_sitemap(priority=>{re}, changefreq=>{re}) called successfully";
     do {
         my @opts = $$_->loc =~ /3\d?\.html/ ?
@@ -473,7 +473,7 @@ if ($is_test = fork ) {
                 { '1.html$' => 'always' },
                 { '^/2'     => 'never' },
             ],
-        )->xml();
+        )->as_xml->sprint;
     } "xml_sitemap(priority=>[re], changefreq=>[re]) called successfully";
     do {
         my @opts = $$_->loc =~ m{/2} ?
@@ -517,8 +517,8 @@ if ($is_test = fork ) {
     } "txt_sitemap() called successfully";
     {
         local $/;
-        open( FILE, "t/data/txt_sitemap.txt" )
-            or die "Cannot open txt_sitemap.txt: $!\n";
+        open( FILE, "t/data/sitemap.txt" )
+            or die "Cannot open sitemap.txt: $!\n";
         $_txt_sitemap = <FILE>;
         close( FILE );
     }
@@ -537,7 +537,7 @@ if ($is_test = fork ) {
                 my $content;
                 {
                     local $/;
-                    open(FILE, $filepath) or die "Cannot open file: $filepath!"; 
+                    open(FILE, $filepath) or die "Cannot open file: $filepath!";
                     $content = <FILE>;
                     close FILE;
                 };
@@ -545,7 +545,7 @@ if ($is_test = fork ) {
                 $hp->parse( $content );
 
                 if ( my $redirect = $hp->header('Location') ) {
-                    $c->send_redirect( $redirect ); 
+                    $c->send_redirect( $redirect );
                 } else {
                     my $response = HTTP::Response->new( HTTP_OK, undef,
                         [
