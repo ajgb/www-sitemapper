@@ -390,7 +390,7 @@ if ($is_test = fork ) {
     my $xml_sitemap;
     my $_xml_sitemap;
     lives_ok {
-        $xml_sitemap = $mapper->xml_sitemap->as_xml->sprint;
+        $xml_sitemap = $mapper->xml_sitemap->as_xml->toString(0);
     } "xml_sitemap() called successfully";
     do {
         my $url = sprintf(
@@ -412,7 +412,7 @@ if ($is_test = fork ) {
         $xml_sitemap = $mapper->xml_sitemap(
             priority => '-0.2',
             changefreq => 'daily',
-        )->as_xml->sprint;
+        )->as_xml->toString(0);
     } "xml_sitemap(priority=>scalar, changefreq=>scalar) called successfully";
     do {
         my $url = sprintf(
@@ -441,7 +441,7 @@ if ($is_test = fork ) {
                 '3\d?\.html' => 'always',
                 '\.pdf$' => 'never',
             },
-        )->as_xml->sprint;
+        )->as_xml->toString(0);
     } "xml_sitemap(priority=>{re}, changefreq=>{re}) called successfully";
     do {
         my @opts = $$_->loc =~ /3\d?\.html/ ?
@@ -473,7 +473,7 @@ if ($is_test = fork ) {
                 { '1.html$' => 'always' },
                 { '^/2'     => 'never' },
             ],
-        )->as_xml->sprint;
+        )->as_xml->toString(0);
     } "xml_sitemap(priority=>[re], changefreq=>[re]) called successfully";
     do {
         my @opts = $$_->loc =~ m{/2} ?
