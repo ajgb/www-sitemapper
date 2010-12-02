@@ -1,5 +1,8 @@
 Revision history for WWW-Sitemapper
 
+1.103360    Thu Dec  2 15:57:35 2010
+            protect from non-resolving local host names (test change)
+
 1.103280    Wed Nov 24 11:01:35 2010
             Switch to Dist::Zilla
             Drop dependency on Search::Sitemap in favour of WWW::Sitemap::XML.
