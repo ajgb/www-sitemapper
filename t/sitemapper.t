@@ -64,7 +64,9 @@ BEGIN {
     }
 };
 
-my $d = HTTP::Daemon->new() || die;
+# We want to be safe from non-resolving local host names
+delete $ENV{HTTP_PROXY};
+my $d = HTTP::Daemon->new( LocalAddr => 'localhost' ) || die;
 my $server_host = $d->url;
 my $is_test;
 my $STATUS_STORAGE_FILE = "t/status.storage";
@@ -564,6 +566,7 @@ if ($is_test = fork ) {
         $c->close;
         undef( $c );
     }
+    $d->shutdown;
 };
 
 END {
