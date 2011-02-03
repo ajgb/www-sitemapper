@@ -421,10 +421,11 @@ sub run {
             }
         }
         if ( my $hook_name = delete $attrs{Hook} ) {
+            my $method_name = $method->name;
             $self->_robot->addHook(
                 $hook_name,
                 sub {
-                    $method->body->($self, @_),
+                    $self->$method_name(@_);
                 }
             );
         };

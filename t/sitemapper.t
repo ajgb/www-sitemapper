@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 116;
+use Test::More tests => 117;
 use Test::NoWarnings;
 use Test::Exception;
 
@@ -23,6 +23,12 @@ BEGIN {
     use Moose;
 
     use base qw( WWW::Sitemapper );
+
+    has 'url_parents' => (
+        is => 'rw',
+        isa => 'HashRef',
+        default => sub { +{} },
+    );
 
     sub _build_robot_config {
         my $self = shift;
@@ -62,6 +68,16 @@ BEGIN {
 
         return 1;
     }
+
+    around '_map_builder' => sub {
+        my $orig = shift;
+        my $self = shift;
+        my ($robot, $hook_name, $from_url, $to_url) = @_;
+
+        $self->url_parents->{$to_url->path}->{$from_url->path} = 1;
+
+        $self->$orig( $robot, $hook_name, $from_url, $to_url );
+    };
 };
 
 # We want to be safe from non-resolving local host names
@@ -502,6 +518,62 @@ if ($is_test = fork ) {
         );
     } for sort { $$a->id cmp $$b->id } $mapper->tree->all_entries;
 
+    is_deeply(
+        $mapper->url_parents,
+        {
+            '/2.html' => {
+                '/2.html'            => 1,
+                '/index.html'        => 1,
+                '/31.html'           => 1,
+                '/3.html'            => 1,
+                '/1.html'            => 1,
+                '/32.html'           => 1,
+                '/21.html'           => 1,
+                '/friendly_url.html' => 1,
+                '/22.html'           => 1
+            },
+            '/11.html' => { '/1.html' => 1 },
+            '/31.html' => {
+                '/32.html' => 1,
+                '/31.html' => 1,
+                '/3.html'  => 1
+            },
+            '/3.html' => {
+                '/32.html'           => 1,
+                '/31.html'           => 1,
+                '/3.html'            => 1,
+                '/friendly_url.html' => 1
+            },
+            '/1.html' => {
+                '/2.html'            => 1,
+                '/index.html'        => 1,
+                '/31.html'           => 1,
+                '/3.html'            => 1,
+                '/1.html'            => 1,
+                '/32.html'           => 1,
+                '/21.html'           => 1,
+                '/friendly_url.html' => 1,
+                '/22.html'           => 1
+            },
+            '/32.html' => {
+                '/32.html' => 1,
+                '/31.html' => 1,
+                '/3.html'  => 1
+            },
+            '/21.html' => {
+                '/2.html'  => 1,
+                '/21.html' => 1,
+                '/22.html' => 1
+            },
+            '/12.html' => { '/1.html' => 1 },
+            '/22.html' => {
+                '/2.html'  => 1,
+                '/21.html' => 1,
+                '/22.html' => 1
+            }
+        },
+        "method modifiers work for Hook'ed methods"
+    );
 
     undef $mapper;
 
