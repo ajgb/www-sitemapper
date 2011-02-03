@@ -1,5 +1,8 @@
 Revision history for WWW-Sitemapper
 
+1.110340    Thu Feb  3 14:51:45 2011
+            Bug fix: allow method modifiers work with Hook'ed methods
+
 1.103360    Thu Dec  2 15:57:35 2010
             protect from non-resolving local host names (test change)
 
