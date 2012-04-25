@@ -1,5 +1,9 @@
 Revision history for WWW-Sitemapper
 
+1.121160    Wed Apr 25 23:18:10 2012
+            [rt#72738]: test fails with libwww-6.03 - fix parsing title from
+            response
+
 1.110340    Thu Feb  3 14:51:45 2011
             Bug fix: allow method modifiers work with Hook'ed methods
 

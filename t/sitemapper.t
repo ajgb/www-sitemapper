@@ -12,6 +12,7 @@ use HTTP::Date qw( time2str );
 use DateTime;
 use HTTP::Status qw( HTTP_OK HTTP_NOT_FOUND );
 use HTML::HeadParser;
+use utf8;
 
 BEGIN {
     use_ok( 'WWW::Sitemapper' );
@@ -267,7 +268,7 @@ if ($is_test = fork ) {
     );
     is_deeply(
         [ map { $_->title } $child3->children ],
-        [ qw( Child31 Child32 ) ],
+        [ qw( Child31 Dziecię32 ) ],
         "child3 nodes have correct titles"
     );
 
@@ -288,7 +289,7 @@ if ($is_test = fork ) {
         "child32->uri is correct"
     );
     is($child32->id, '0:0:0:0:1', "child32->id is correct");
-    is($child32->title, 'Child32', "child32->title is correct");
+    is($child32->title, 'Dziecię32', "child32->title is correct");
     is scalar @{$child32->nodes}, 0, 'child32 has no nodes';
 
     # Child2 / 2.html
@@ -378,7 +379,7 @@ if ($is_test = fork ) {
     } "txt_sitemap() called successfully";
     {
         local $/;
-        open( FILE, "t/data/sitemap_with_id_with_title.txt" )
+        open( FILE, "<:utf8", "t/data/sitemap_with_id_with_title.txt" )
             or die "Cannot open sitemap_with_id_with_title.txt: $!\n";
         $_txt_sitemap = <FILE>;
         close( FILE );
@@ -395,7 +396,7 @@ if ($is_test = fork ) {
     } "html_sitemap() called successfully";
     {
         local $/;
-        open( FILE, "t/data/html_sitemap.html" )
+        open( FILE, "<:utf8", "t/data/html_sitemap.html" )
             or die "Cannot open html_sitemap.html: $!\n";
         $_html_sitemap = <FILE>;
         close( FILE );

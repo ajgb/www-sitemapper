@@ -13,6 +13,8 @@ use WWW::Robot;
 use WWW::Sitemap::XML;
 use WWW::Sitemap::XML::URL;
 use Storable qw( store retrieve );
+use HTML::HeadParser;
+use Encode ();
 
 BEGIN {
     extends qw( MooseX::MethodAttributes::Inheritable );
@@ -984,12 +986,13 @@ sub _set_page_data : Hook('invoke-after-get') {
 
     if ( my $node = $self->tree->find_node( $url ) ) {
 
-        if ( $response->headers->title ) {
-            # HTTP::Headers decodes the content.
-            my ($title) = $response->content =~ m|<title>(.*?)</title>|is;
-            if ( $title ) {
-                $node->title( $title );
-            }
+        my $hp = HTML::HeadParser->new;
+        $hp->xml_mode(1) if $response->content_is_xhtml;
+        $hp->utf8_mode(1) if $] >= 5.008 && $HTML::Parser::VERSION >= 3.40;
+
+        $hp->parse($response->content);
+        if ( my $title = $hp->header('title') ) {
+            $node->title( Encode::decode($response->content_charset, $title) );
         }
         if ( my $last_modified = $response->headers->last_modified ) {
             $node->last_modified( $last_modified );
